@@ -140,3 +140,28 @@ test("getHealth reports Loki readiness", async () => {
     },
   );
 });
+
+test("getHealth falls back to query endpoint when ready returns non-200", async () => {
+  await withLokiServer(
+    (request) => {
+      if (request.url === "/ready") {
+        return { status: 503, body: { error: "not ready" } };
+      }
+      return {
+        body: {
+          status: "success",
+          data: {
+            resultType: "streams",
+            result: [],
+          },
+        },
+      };
+    },
+    async (baseUrl) => {
+      const client = new LokiClient({ baseUrl });
+      const result = await client.getObservabilityHealth();
+      assert.equal(result.status, "ok");
+      assert.equal(result.loki.ready, true);
+    },
+  );
+});

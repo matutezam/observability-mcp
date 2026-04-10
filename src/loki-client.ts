@@ -139,17 +139,38 @@ export class LokiClient {
   }
 
   async getObservabilityHealth(): Promise<ObservabilityHealth> {
-    const response = await this.fetchImpl(`${this.baseUrl}/ready`, {
+    const readyResponse = await this.fetchImpl(`${this.baseUrl}/ready`, {
       headers: this.buildHeaders(),
     });
 
-    return {
-      status: response.ok ? "ok" : "degraded",
-      loki: {
-        ready: response.ok,
-        url: this.baseUrl,
-      },
-    };
+    if (readyResponse.ok) {
+      return {
+        status: "ok",
+        loki: {
+          ready: true,
+          url: this.baseUrl,
+        },
+      };
+    }
+
+    try {
+      await this.queryStructured('{stack=~".+"}', msToNs(Date.now() - parseDurationToMs("5m")), msToNs(Date.now()), 1);
+      return {
+        status: "ok",
+        loki: {
+          ready: true,
+          url: this.baseUrl,
+        },
+      };
+    } catch {
+      return {
+        status: "degraded",
+        loki: {
+          ready: false,
+          url: this.baseUrl,
+        },
+      };
+    }
   }
 
   private async queryStructured(query: string, startNs: bigint, endNs: bigint, limit: number): Promise<ParsedLogEntry[]> {
