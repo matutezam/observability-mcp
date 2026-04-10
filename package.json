@@ -1,0 +1,36 @@
+{
+  "name": "observability-mcp",
+  "version": "0.1.0",
+  "description": "Read-only MCP server for querying Capsule observability logs from Loki.",
+  "type": "module",
+  "bin": {
+    "observability-mcp": "./dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts",
+    "test": "node --import tsx --test test/**/*.test.ts",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "mcp",
+    "observability",
+    "loki",
+    "grafana",
+    "logs"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.1",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0"
+  }
+}
