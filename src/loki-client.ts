@@ -98,8 +98,8 @@ export class LokiClient {
         entries: [],
         query: {
           logql: seedQuery,
-          since: new Date(seedWindow.start).toISOString(),
-          until: new Date(seedWindow.end).toISOString(),
+          since: nsToIso(seedWindow.start),
+          until: nsToIso(seedWindow.end),
           limit: input.limit ?? DEFAULT_LIMIT,
         },
       };
